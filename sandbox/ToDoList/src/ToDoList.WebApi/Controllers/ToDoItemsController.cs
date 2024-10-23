@@ -1,5 +1,6 @@
 namespace ToDoList.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using ToDoList.Domain.DTO;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 
@@ -7,13 +8,14 @@ using ToDoList.Domain.Models;
 [Route("api/[controller]")]
 public class ToDoItemsController : ControllerBase
 {
-    private static List<ToDoItem> items = [];
+    public static List<ToDoItem> items = [];
 
     //DTO - Data Transfer Object
 
     [HttpPost]
     public IActionResult Create(ToDoItemCreateRequestDto request)
     {
+        items.Clear();
         try
         {
             var newToDoItem = request.ToDomain();
@@ -30,9 +32,21 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Read()
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
-        return Ok();
+        List<ToDoItem> itemsToGet;
+        try
+        {
+            itemsToGet = items;
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError); //500
+        }
+        //respond to client
+        return (itemsToGet.Count == 0)
+            ? NotFound() //404
+            : Ok(itemsToGet.Select(ToDoItemGetResponseDto.FromDomain)); //200
     }
 
     [HttpGet("toDoItemId:int")]

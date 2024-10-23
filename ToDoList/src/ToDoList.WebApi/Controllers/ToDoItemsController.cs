@@ -27,13 +27,13 @@ public class ToDoItemsController : ControllerBase
         }
 
         //respond to client
-        return NoContent(); //201 //tato metoda z nějakého důvodu vrací status code No Content 204, zjištujeme proč ;)
+        return Created(); //201 //tato metoda z nějakého důvodu vrací status code No Content 204, zjištujeme proč ;)
     }
 
     [HttpGet]
     public IActionResult Read()
     {
-        return Ok();
+        return Problem();
     }
 
     [HttpGet("{toDoItemId:int}")]
